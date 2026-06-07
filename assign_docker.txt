@@ -1,0 +1,269 @@
+Docker Command Flow Trick
+Image → Container → Start → Stop → Remove
+
+pull → run → ps → stop → rm
+
+Remember:
+
+IMAGE = Template
+
+CONTAINER = Running Instance
+Q1: Pull and Run Image
+Step 1: Pull nginx Image
+docker pull nginx
+Trick
+pull = Download
+
+Think:
+
+Docker Hub → My PC
+Step 2: Run Container
+docker run -d nginx
+Important
+-d = Detached Mode
+
+Container runs in background.
+
+Step 3: Check Running Containers
+docker ps
+Trick
+ps = Process Status
+
+Shows running containers only.
+
+Step 4: Stop Container
+
+Find CONTAINER ID from docker ps
+
+docker stop <container_id>
+
+Example:
+
+docker stop a1b2c3d4
+Step 5: Remove Container
+docker rm <container_id>
+
+Example:
+
+docker rm a1b2c3d4
+Q2: Image Commands Practice
+Step 1: Pull Alpine Image
+docker pull alpine
+Viva
+
+Why Alpine?
+
+Very lightweight Linux image.
+Step 2: List Images
+docker images
+
+OR
+
+docker image ls
+Step 3: Inspect Alpine Image
+docker inspect alpine
+Trick
+inspect = Details
+
+Shows JSON configuration.
+
+Step 4: Remove Alpine Image
+docker rmi alpine
+
+OR
+
+docker image rm alpine
+Trick
+rmi = Remove Image
+Step 5: What Happens If Image Is In Use?
+
+Example:
+
+docker rmi nginx
+
+while container is running.
+
+Error:
+
+image is being used by running container
+Viva Answer
+Docker does not allow deletion of an image that is currently used by a container.
+First stop and remove the container, then remove the image.
+Q3: Container Commands
+Step 1: Run Ubuntu Container Interactive Mode
+docker run -it ubuntu
+Important
+-i = Interactive
+
+-t = Terminal
+
+Memory Trick:
+
+IT = Interactive Terminal
+Step 2: Execute Linux Commands
+
+Inside Container:
+
+ls
+pwd
+whoami
+Step 3: Exit Container
+exit
+Step 4: List All Containers
+docker ps -a
+Trick
+-a = All
+
+Shows running + stopped.
+
+Step 5: Restart Container
+
+Get container id:
+
+docker ps -a
+
+Then:
+
+docker restart <container_id>
+
+Example:
+
+docker restart a1b2c3d4
+Q4: Naming and Renaming
+Step 1: Run nginx Container with Name
+docker run -d --name web_server nginx
+Trick
+--name = Give Friendly Name
+Step 2: Verify Name
+docker ps
+
+Look under NAMES column.
+
+Step 3: Stop Container
+docker stop web_server
+Step 4: Rename Container
+docker rename web_server my_server
+
+Verify:
+
+docker ps -a
+Step 5: Remove Container
+docker rm my_server
+Q5: Tagging Docker Image
+Step 1: Pull nginx
+docker pull nginx
+Step 2: Create Tag mynginx:v1
+docker tag nginx mynginx:v1
+Trick
+tag = Create Alias
+Step 3: Create Latest Tag
+docker tag nginx mynginx:latest
+Step 4: Verify
+docker images
+
+Expected:
+
+nginx
+
+mynginx:v1
+
+mynginx:latest
+Step 5: Remove One Tag
+docker rmi mynginx:v1
+
+Verify:
+
+docker images
+Viva
+
+What happened?
+
+Only the tag is removed.
+
+Image remains if another tag still references it.
+Q6: Push Image to Docker Hub
+Step 1: Login
+docker login
+
+Enter:
+
+Username
+Password
+
+Expected:
+
+Login Succeeded
+Step 2: Tag Image
+
+Example username:
+
+sumedh123
+
+Command:
+
+docker tag mynginx:v1 sumedh123/mynginx:v1
+Step 3: Push Image
+docker push sumedh123/mynginx:v1
+Trick
+push = Upload
+
+Think:
+
+My PC → Docker Hub
+Step 4: Logout
+docker logout
+Step 5: Verify
+
+Open Docker Hub website.
+
+Check repository:
+
+mynginx
+Q7: Basic Networking and Port Mapping
+Step 1: Run nginx with Port Mapping
+docker run -d -p 8080:80 --name nginx_port nginx
+Most Important Trick
+HostPort : ContainerPort
+8080 : 80
+
+Meaning:
+
+PC Port 8080
+      ↓
+Container Port 80
+Step 2: Access Browser
+
+Open:
+
+http://localhost:8080
+
+Expected:
+
+Welcome to nginx!
+Step 3: List Networks
+docker network ls
+
+Expected:
+
+bridge
+host
+none
+
+(Windows may show bridge and others depending on setup.)
+
+Step 4: Inspect Bridge Network
+docker network inspect bridge
+Trick
+network inspect = network details
+Step 5: Explain Port Mapping
+Viva Answer
+Port mapping connects a port on the host machine to a port inside a container.
+
+Example:
+
+8080:80
+
+8080 = Host Machine Port
+80 = Container Port
+
+Users access localhost:8080 and traffic is forwarded to port 80 inside the container.
