@@ -1,0 +1,230 @@
+Q1. Pull and Run Image
+docker pull nginx
+
+Use: Download nginx image from Docker Hub.
+---------------------------------------------
+
+docker run -d nginx
+
+Use: Create and run nginx container in background.
+----------------------------------------------------
+docker ps
+
+Use: Show running containers.
+---------------------------------------------------------------
+
+docker stop <container_id>
+
+Use: Stop a running container.
+-------------------------------------------------------------------
+docker rm <container_id>
+
+Use: Remove a stopped container.
+------------------------------------------------------------------------
+Q2. Image Commands Practice
+docker pull alpine
+
+Use: Download Alpine Linux image.
+------------------------------------------------------------------------------
+docker images
+
+Use: List all local images.
+-----------------------------------------------------------------------------
+docker inspect alpine
+
+Use: Show detailed information about alpine image.
+--------------------------------------------------------------------------------
+docker rmi alpine
+
+Use: Remove alpine image.
+-------------------------------------------------------------------------------
+docker rmi nginx
+
+Use: Remove nginx image.
+--------------------------------------------------------------------------
+Note: If a container is using the image, Docker will show an error and won't remove it.
+
+Q3. Container Commands
+docker run -it ubuntu
+
+Use: Run Ubuntu container in interactive mode.
+-----------------------------------------------------------------
+ls
+
+Use: List files/directories inside container.
+----------------------------------------------------------------------------------
+pwd
+
+Use: Show current working directory.
+---------------------------------------------------------------------------
+exit
+
+Use: Exit from container.
+-------------------------------------------------------------------
+docker ps -a
+
+Use: Show all containers (running + stopped).
+---------------------------------------------------------------------------
+docker restart <container_id>
+
+Use: Restart a container.
+------------------------------------------------------------------------
+Q4. Naming and Renaming
+docker run -d --name web_server nginx
+
+Use: Run nginx container with custom name.
+---------------------------------------------------------------------------
+docker ps
+
+Use: Verify container name.
+--------------------------------------------------------------------------
+docker stop web_server
+
+Use: Stop container.
+-----------------------------------------------------------------------------
+docker rename web_server my_server
+
+Use: Rename container.
+----------------------------------------------------------------------------------
+docker rm my_server
+
+Use: Remove container.
+---------------------------------------------------------------------------------
+Q5. Tagging Docker Image
+docker pull nginx
+
+Use: Download nginx image.
+----------------------------------------------------------------------------
+docker tag nginx mynginx:v1
+
+Use: Create new tag mynginx:v1.
+------------------------------------------------------------------------------------
+docker tag nginx mynginx:latest
+
+Use: Create new tag mynginx:latest.
+--------------------------------------------------------------------------------------
+docker images
+
+Use: Verify image tags.
+------------------------------------------------------------------------------------------
+docker rmi mynginx:v1
+
+Use: Remove specific tag.
+-------------------------------------------------------------------------------------------Q6. Push Image to Docker Hub
+docker login
+
+Use: Login to Docker Hub.
+------------------------------------------------------------------------------------------
+docker tag mynginx:v1 <username>/mynginx:v1
+
+Use: Prepare image for Docker Hub upload.
+--------------------------------------------------------------------------------
+docker push <username>/mynginx:v1
+
+Use: Upload image to Docker Hub.
+-----------------------------------------------------------------------------
+docker logout
+
+Use: Logout from Docker Hub.
+---------------------------------------------------------------------------------
+Q7. Basic Networking and Port Mapping
+docker run -d -p 8080:80 nginx
+
+Use: Run nginx and map host port 8080 to container port 80.
+
+http://localhost:8080
+
+Use: Access nginx web page from browser.
+-----------------------------------------------------------------------------------
+docker network ls
+
+Use: List Docker networks.
+-------------------------------------------------------------------------------------
+docker network inspect bridge
+
+Use: Show details of bridge network.
+
+Important Commands to Memorize
+docker pull
+
+Use: Download image.
+------------------------------------------------------------------------------------------
+docker run
+
+Use: Create and start container.
+-------------------------------------------------------------------
+docker ps
+
+Use: Show running containers.
+-------------------------------------------------------------
+docker ps -a
+
+Use: Show all containers.
+-----------------------------------------------------------------------------
+docker stop
+
+Use: Stop container.
+----------------------------------------------------------------------------------------
+docker start
+
+Use: Start stopped container.
+-----------------------------------------------------------------------------------------
+docker restart
+
+Use: Restart container.
+
+docker rm
+
+Use: Remove container.
+
+docker rmi
+
+Use: Remove image.
+
+docker images
+
+Use: List images.
+---------------------------------------------------------------------------------------
+docker inspect
+
+Use: Show detailed information.
+---------------------------------------------------------------
+docker tag
+
+Use: Create image tag.
+----------------------------------------------------------------------------
+docker push
+
+Use: Upload image.
+------------------------------------------------------------------------------------
+docker login
+
+Use: Login Docker Hub.
+--------------------------------------------------
+docker logout
+
+Use: Logout Docker Hub.
+-----------------------------------------------------------------------------
+docker network ls
+
+Use: List networks.
+-----------------------------------------------------------------------------
+docker network inspect
+
+Use: Inspect network.
+----------------------------------------------------------------------------------
+docker run -it
+
+Use: Interactive container.
+-----------------------------------------------------------------
+docker run -d
+
+Use: Background container.
+----------------------------------------------------------------------------
+docker run --name
+
+Use: Assign container name.
+---------------------------------------------------------------------------------
+docker run -p
+
+Use: Port mapping.
