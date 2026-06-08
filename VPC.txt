@@ -1,0 +1,685 @@
+# AWS VPC Lab Notes (Assignment 8)
+
+## Objective
+
+Learn how to:
+
+* Create a VPC
+* Create Public and Private Subnets
+* Configure Internet Gateway
+* Configure Route Tables
+* Launch EC2 instances
+* Attach IAM Roles
+* Access S3 from EC2
+* Create Bastion Host
+* Create IAM Users
+* Test S3 Permissions
+
+---
+
+# Q3. Create VPC with Public Subnet
+
+## Step 1: Create VPC
+
+Navigation:
+
+```text
+AWS Console
+→ VPC
+→ Your VPCs
+→ Create VPC
+```
+
+Configuration:
+
+| Parameter  | Value       |
+| ---------- | ----------- |
+| Name       | my-vpc      |
+| CIDR Block | 10.0.0.0/16 |
+
+Click **Create VPC**
+
+---
+
+## Step 2: Create Public Subnet
+
+Navigation:
+
+```text
+VPC
+→ Subnets
+→ Create Subnet
+```
+
+Configuration:
+
+| Parameter   | Value         |
+| ----------- | ------------- |
+| VPC         | my-vpc        |
+| Subnet Name | public-subnet |
+| CIDR        | 10.0.1.0/24   |
+
+Click **Create Subnet**
+
+---
+
+## Step 3: Create Internet Gateway
+
+Navigation:
+
+```text
+VPC
+→ Internet Gateways
+→ Create Internet Gateway
+```
+
+Configuration:
+
+| Parameter | Value  |
+| --------- | ------ |
+| Name      | my-igw |
+
+Click **Create**
+
+---
+
+## Step 4: Attach Internet Gateway
+
+Navigation:
+
+```text
+Internet Gateways
+→ Select my-igw
+→ Actions
+→ Attach to VPC
+```
+
+Select:
+
+```text
+my-vpc
+```
+
+Click **Attach**
+
+---
+
+## Step 5: Create Route Table
+
+Navigation:
+
+```text
+VPC
+→ Route Tables
+→ Create Route Table
+```
+
+Configuration:
+
+| Parameter | Value     |
+| --------- | --------- |
+| Name      | public-rt |
+| VPC       | my-vpc    |
+
+Click **Create**
+
+---
+
+## Step 6: Add Internet Route
+
+Navigation:
+
+```text
+Route Tables
+→ public-rt
+→ Routes
+→ Edit Routes
+→ Add Route
+```
+
+Configuration:
+
+| Destination | Target |
+| ----------- | ------ |
+| 0.0.0.0/0   | my-igw |
+
+Save Changes.
+
+---
+
+## Step 7: Associate Public Subnet
+
+Navigation:
+
+```text
+public-rt
+→ Subnet Associations
+→ Edit
+```
+
+Select:
+
+```text
+public-subnet
+```
+
+Save.
+
+---
+
+# Q4. Launch EC2 Inside Public Subnet
+
+Navigation:
+
+```text
+EC2
+→ Launch Instance
+```
+
+Configuration:
+
+| Parameter             | Value         |
+| --------------------- | ------------- |
+| Name                  | vpc-ec2       |
+| AMI                   | Ubuntu        |
+| Instance Type         | t2.micro      |
+| VPC                   | my-vpc        |
+| Subnet                | public-subnet |
+| Auto Assign Public IP | Enable        |
+
+---
+
+## Security Group
+
+### SSH Access
+
+| Type | Port | Source |
+| ---- | ---- | ------ |
+| SSH  | 22   | My IP  |
+
+### HTTP Access
+
+| Type | Port | Source    |
+| ---- | ---- | --------- |
+| HTTP | 80   | 0.0.0.0/0 |
+
+Launch Instance.
+
+---
+
+## Connect to EC2
+
+Navigation:
+
+```text
+EC2
+→ Select Instance
+→ Connect
+→ EC2 Instance Connect
+→ Connect
+```
+
+---
+
+# Q5. Attach IAM Role to EC2 and Access S3
+
+## Step 1: Create IAM Role
+
+Navigation:
+
+```text
+IAM
+→ Roles
+→ Create Role
+```
+
+Select:
+
+```text
+AWS Service
+→ EC2
+```
+
+Attach Policy:
+
+```text
+AmazonS3FullAccess
+```
+
+Role Name:
+
+```text
+ec2-s3-role
+```
+
+Create Role.
+
+---
+
+## Step 2: Attach Role to EC2
+
+Navigation:
+
+```text
+EC2
+→ Select Instance
+→ Actions
+→ Security
+→ Modify IAM Role
+```
+
+Select:
+
+```text
+ec2-s3-role
+```
+
+Save.
+
+---
+
+## Step 3: Verify Access
+
+Connect to EC2 and run:
+
+```bash
+aws s3 ls
+```
+
+Expected Output:
+
+```text
+Bucket List
+```
+
+or empty output if no buckets exist.
+
+---
+
+# Q6. Create Private Subnet + Private EC2
+
+## Step 1: Create Private Subnet
+
+Navigation:
+
+```text
+VPC
+→ Subnets
+→ Create Subnet
+```
+
+Configuration:
+
+| Parameter | Value          |
+| --------- | -------------- |
+| Name      | private-subnet |
+| CIDR      | 10.0.2.0/24    |
+| VPC       | my-vpc         |
+
+Create.
+
+---
+
+## Step 2: Create Route Table
+
+Navigation:
+
+```text
+VPC
+→ Route Tables
+→ Create Route Table
+```
+
+Configuration:
+
+| Parameter | Value      |
+| --------- | ---------- |
+| Name      | private-rt |
+| VPC       | my-vpc     |
+
+Create.
+
+---
+
+## Step 3: Associate Private Subnet
+
+Navigation:
+
+```text
+private-rt
+→ Subnet Associations
+→ Edit
+```
+
+Select:
+
+```text
+private-subnet
+```
+
+Save.
+
+---
+
+### Important
+
+DO NOT add:
+
+```text
+0.0.0.0/0 → Internet Gateway
+```
+
+Private subnet should only contain:
+
+```text
+Local Route
+```
+
+---
+
+## Step 4: Launch Private EC2
+
+Navigation:
+
+```text
+EC2
+→ Launch Instance
+```
+
+Configuration:
+
+| Parameter | Value          |
+| --------- | -------------- |
+| Name      | private-ec2    |
+| Subnet    | private-subnet |
+| Public IP | Disable        |
+
+---
+
+## Security Group
+
+| Type | Port | Source      |
+| ---- | ---- | ----------- |
+| SSH  | 22   | 10.0.0.0/16 |
+
+Launch.
+
+---
+
+# Q7. Create Bastion Host
+
+## Purpose
+
+A Bastion Host is a Jump Server used to access instances inside private subnets.
+
+---
+
+## Launch Bastion Host
+
+Navigation:
+
+```text
+EC2
+→ Launch Instance
+```
+
+Configuration:
+
+| Parameter | Value         |
+| --------- | ------------- |
+| Name      | bastion-host  |
+| Subnet    | public-subnet |
+| Public IP | Enable        |
+
+---
+
+## Security Group
+
+| Type | Port | Source |
+| ---- | ---- | ------ |
+| SSH  | 22   | My IP  |
+
+Launch.
+
+---
+
+## Modify Private EC2 Security Group
+
+Navigation:
+
+```text
+Security Groups
+→ private-ec2 SG
+→ Edit Inbound Rules
+```
+
+Remove:
+
+```text
+SSH from 10.0.0.0/16
+```
+
+Add:
+
+```text
+SSH
+Source = Bastion Security Group
+```
+
+Save.
+
+---
+
+# Q8. Verify Private Access Through Bastion
+
+## Connect to Bastion
+
+```bash
+ssh -i key.pem ubuntu@<bastion-public-ip>
+```
+
+---
+
+## Connect to Private EC2
+
+From Bastion:
+
+```bash
+ssh -i key.pem ubuntu@<private-ip>
+```
+
+Example:
+
+```bash
+ssh -i key.pem ubuntu@10.0.2.45
+```
+
+---
+
+## Observation
+
+* Private EC2 has no public IP.
+* Direct internet access is not possible.
+* Access is only through Bastion Host.
+
+---
+
+# Q9. Create IAM Users
+
+## User 1
+
+Navigation:
+
+```text
+IAM
+→ Users
+→ Create User
+```
+
+Configuration:
+
+```text
+Name: s3-user-allowed
+```
+
+Permissions:
+
+```text
+AmazonS3FullAccess
+```
+
+Create User.
+
+---
+
+## User 2
+
+Navigation:
+
+```text
+IAM
+→ Users
+→ Create User
+```
+
+Configuration:
+
+```text
+Name: s3-user-denied
+```
+
+Permissions:
+
+```text
+No Policy Attached
+```
+
+Create User.
+
+---
+
+# Q10. Test S3 Access
+
+## Login as User1
+
+Navigation:
+
+```text
+AWS Console
+→ S3
+```
+
+Upload a file.
+
+Result:
+
+```text
+SUCCESS
+```
+
+---
+
+## Login as User2
+
+Navigation:
+
+```text
+AWS Console
+→ S3
+```
+
+Attempt Upload.
+
+Result:
+
+```text
+Access Denied
+```
+
+---
+
+# Viva Questions
+
+## What is a VPC?
+
+A Virtual Private Cloud (VPC) is a logically isolated network in AWS where resources like EC2 instances can be launched.
+
+---
+
+## What is a Subnet?
+
+A subnet is a smaller network inside a VPC.
+
+Example:
+
+```text
+VPC: 10.0.0.0/16
+
+Public Subnet: 10.0.1.0/24
+Private Subnet: 10.0.2.0/24
+```
+
+---
+
+## What is an Internet Gateway?
+
+An Internet Gateway provides internet access to resources inside a VPC.
+
+---
+
+## What is a Route Table?
+
+A Route Table contains routing rules that determine where network traffic should go.
+
+---
+
+## What does 0.0.0.0/0 mean?
+
+It represents all IPv4 addresses (the entire internet).
+
+---
+
+## Difference Between Public and Private Subnet
+
+| Public Subnet              | Private Subnet            |
+| -------------------------- | ------------------------- |
+| Has Internet Gateway Route | No Internet Gateway Route |
+| Public IP Allowed          | No Public IP              |
+| Internet Accessible        | Not Internet Accessible   |
+
+---
+
+## What is a Bastion Host?
+
+A Bastion Host is a public EC2 instance used to securely access private EC2 instances.
+
+---
+
+## Why Use IAM Roles Instead of Access Keys?
+
+IAM Roles provide temporary credentials and are more secure than storing access keys inside EC2 instances.
+
+---
+
+## Difference Between Security Group and NACL
+
+| Security Group   | NACL                 |
+| ---------------- | -------------------- |
+| Instance Level   | Subnet Level         |
+| Stateful         | Stateless            |
+| Allow Rules Only | Allow and Deny Rules |
+
+---
+
+# Conclusion
+
+This lab demonstrates:
+
+* AWS Networking
+* VPC Configuration
+* Public and Private Subnets
+* EC2 Deployment
+* IAM Roles
+* S3 Access Control
+* Bastion Host Architecture
+* User Permission Management
