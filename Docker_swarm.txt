@@ -1,0 +1,354 @@
+# Assignment 5 - Docker Swarm
+
+## Q1. Docker Swarm: Nginx Service
+
+### docker swarm init
+
+Use: Initialize Docker Swarm mode.
+
+### docker service create --name nginx-service --replicas 2 -p 8080:80 nginx
+
+Use: Create Nginx service with 2 replicas and expose container port 80 on host port 8080.
+
+### docker service ls
+
+Use: List all running Swarm services.
+
+### docker service ps nginx-service
+
+Use: View tasks/replicas running under nginx-service.
+
+### http://localhost:8080
+
+Use: Access Nginx web page from browser.
+
+---
+
+## Q2. Docker Swarm: Python Worker Service
+
+### Create app.py
+
+```python
+import time
+
+while True:
+    print("Running in Swarm...")
+    time.sleep(5)
+```
+
+Use: Prints "Running in Swarm..." every 5 seconds.
+
+### Create Dockerfile
+
+```dockerfile
+FROM python:3.11
+
+WORKDIR /app
+
+COPY app.py .
+
+CMD ["python","app.py"]
+```
+
+Use: Build Python container image.
+
+### docker build -t python-worker .
+
+Use: Build Docker image named python-worker.
+
+### docker service create --name python-service --replicas 3 python-worker
+
+Use: Deploy Python service with 3 replicas.
+
+### docker service ls
+
+Use: Verify service is running.
+
+### docker service ps python-service
+
+Use: Check task distribution among replicas.
+
+### docker ps
+
+Use: List running containers.
+
+### docker logs <container_id>
+
+Use: View logs from a running container.
+
+---
+
+## Q3. Docker Swarm: Scaling Service
+
+### docker service create --name nginx-service --replicas 2 nginx
+
+Use: Create Nginx service with 2 replicas.
+
+### docker service scale nginx-service=5
+
+Use: Increase replicas from 2 to 5.
+
+### docker service ls
+
+Use: Verify replica count.
+
+### docker service ps nginx-service
+
+Use: View running tasks.
+
+### docker service scale nginx-service=1
+
+Use: Reduce replicas from 5 to 1.
+
+### docker service ps nginx-service
+
+Use: Observe terminated tasks.
+
+Observation:
+When scaling down, extra containers are automatically stopped and removed. Only required replicas remain active.
+
+---
+
+## Q4. Docker Swarm: Rolling Update
+
+### docker service create --name nginx-service nginx:1.25
+
+Use: Deploy service using nginx version 1.25.
+
+### docker service update --image nginx:latest --update-parallelism 1 --update-delay 10s nginx-service
+
+Use:
+
+* Update image to latest version
+* Update one container at a time
+* Wait 10 seconds between updates
+
+### docker service ps nginx-service
+
+Use: Check update progress.
+
+### docker service inspect nginx-service
+
+Use: View detailed service configuration.
+
+### docker service rollback nginx-service
+
+Use: Roll back to previous version if update fails.
+
+---
+
+## Q5. Remove Service and Leave Swarm
+
+### docker service ls
+
+Use: List all running services.
+
+### docker service rm nginx-service
+
+Use: Remove nginx-service.
+
+### docker service rm python-service
+
+Use: Remove python-service.
+
+### docker service ls
+
+Use: Verify services are deleted.
+
+### docker swarm leave --force
+
+Use: Exit Docker Swarm mode.
+
+---
+
+## Q6. Usage of Docker Swarm
+
+### Container Orchestration
+
+Use: Automatically manages multiple containers.
+
+### Service Deployment
+
+Use: Deploy applications as services.
+
+### Scaling Containers
+
+Use: Increase or decrease replicas easily.
+
+Example:
+
+```bash
+docker service scale nginx-service=5
+```
+
+### Load Balancing
+
+Use: Distributes incoming traffic across replicas.
+
+### Rolling Updates
+
+Use: Updates containers without downtime.
+
+### High Availability
+
+Use: Automatically replaces failed containers.
+
+### Multi-node Container Management
+
+Use: Manage containers across multiple servers from a single Swarm cluster.
+
+---
+
+## Q7. Limitations of Docker Swarm
+
+### Less Powerful than Kubernetes
+
+Limitation: Fewer advanced orchestration features.
+
+### Smaller Ecosystem
+
+Limitation: Smaller community and fewer third-party tools.
+
+### Limited Auto-scaling Support
+
+Limitation: No advanced built-in auto-scaling.
+
+### Limited Networking Features
+
+Limitation: Less flexible networking compared to Kubernetes.
+
+### Limited Storage Management
+
+Limitation: Fewer persistent storage options.
+
+### Not Widely Used in Large Production Systems
+
+Limitation: Most enterprises prefer Kubernetes.
+
+### Fewer Monitoring and Security Integrations
+
+Limitation: Limited monitoring, logging and security ecosystem.
+
+---
+
+# Important Docker Swarm Commands
+
+### docker swarm init
+
+Use: Initialize Swarm mode.
+
+### docker service create
+
+Use: Create a service.
+
+### docker service ls
+
+Use: List services.
+
+### docker service ps <service_name>
+
+Use: Show service tasks.
+
+### docker service scale
+
+Use: Scale replicas.
+
+### docker service update
+
+Use: Update service configuration/image.
+
+### docker service rollback
+
+Use: Roll back service update.
+
+### docker service rm
+
+Use: Remove service.
+
+### docker swarm leave --force
+
+Use: Exit Swarm mode.
+
+---
+
+# Viva Questions
+
+### What is Docker Swarm?
+
+Docker Swarm is Docker's native container orchestration platform used to manage multiple containers across one or more machines.
+
+### What is a Service?
+
+A Service is a definition of how containers should run in Swarm mode.
+
+### What is a Replica?
+
+A Replica is a copy of a container running as part of a service.
+
+### What is Scaling?
+
+Scaling means increasing or decreasing the number of replicas.
+
+### What is Rolling Update?
+
+Updating containers gradually without stopping the entire application.
+
+### What is Load Balancing?
+
+Distributing incoming traffic among multiple replicas.
+
+### What is High Availability?
+
+Automatic replacement of failed containers to keep applications running.
+
+### Difference Between Container and Service?
+
+Container:
+
+* Single running instance.
+
+Service:
+
+* Manages multiple containers automatically.
+
+---
+
+# Memory Trick
+
+INIT
+↓
+CREATE
+↓
+LIST
+↓
+CHECK TASKS
+↓
+SCALE
+↓
+UPDATE
+↓
+ROLLBACK
+↓
+REMOVE
+↓
+LEAVE
+
+Commands Sequence:
+
+docker swarm init
+
+docker service create
+
+docker service ls
+
+docker service ps
+
+docker service scale
+
+docker service update
+
+docker service rollback
+
+docker service rm
+
+docker swarm leave --force
