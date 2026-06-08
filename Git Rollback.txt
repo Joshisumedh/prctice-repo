@@ -1,0 +1,171 @@
+Git Rollback (Undo Changes) – CDAC Lab Exam Notes
+Objective
+
+Learn how to roll back (undo) changes in Git when a commit contains bugs or unwanted modifications.
+
+Method 1: Rollback Using git reset
+Scenario
+
+A developer commits a change that introduces a bug and wants to return to the previous working version.
+
+Step 1: Create a Repository
+mkdir git-rollback-demo
+cd git-rollback-demo
+
+git init
+
+Output:
+
+Initialized empty Git repository
+Step 2: Create First Version
+
+Create a file:
+
+echo "Version 1" > app.txt
+
+Add and commit:
+
+git add app.txt
+git commit -m "Initial commit"
+
+Verify:
+
+cat app.txt
+
+Output:
+
+Version 1
+Step 3: Create a Buggy Version
+
+Modify the file:
+
+echo "Version 2 - Buggy Code" > app.txt
+
+Commit the change:
+
+git add app.txt
+git commit -m "Added buggy code"
+
+Verify:
+
+cat app.txt
+
+Output:
+
+Version 2 - Buggy Code
+Step 4: View Commit History
+git log --oneline
+
+Example Output:
+
+a1b2c3d Added buggy code
+x9y8z7w Initial commit
+Step 5: Roll Back to Previous Commit
+Option 1: Using Commit ID
+git reset --hard x9y8z7w
+Option 2: Roll Back One Commit
+git reset --hard HEAD~1
+Step 6: Verify Rollback
+cat app.txt
+
+Output:
+
+Version 1
+
+Rollback successful.
+
+Method 2: Rollback Using git revert
+When to Use
+
+Use git revert when the commit has already been pushed to GitHub and you want to safely undo changes without deleting commit history.
+
+Revert Last Commit
+git revert HEAD
+
+Git will create a new commit that reverses the previous commit.
+
+Check History
+git log --oneline
+
+Example Output:
+
+f4e5d6 Revert "Added buggy code"
+a1b2c3d Added buggy code
+x9y8z7w Initial commit
+Difference Between Reset and Revert
+Feature	git reset	git revert
+Removes commit history	Yes	No
+Creates new commit	No	Yes
+Safe after push	No	Yes
+Best for local rollback	Yes	No
+Best for shared repositories	No	Yes
+Important Commands for CDAC Lab Exam
+View Commit History
+git log --oneline
+Roll Back Last Commit
+git reset --hard HEAD~1
+Roll Back Using Commit ID
+git reset --hard <commit-id>
+
+Example:
+
+git reset --hard x9y8z7w
+Safely Undo Last Commit
+git revert HEAD
+Complete Lab Exam Demonstration
+mkdir git-rollback-demo
+cd git-rollback-demo
+
+git init
+
+echo "Version 1" > app.txt
+git add app.txt
+git commit -m "Initial commit"
+
+echo "Version 2 - Buggy Code" > app.txt
+git add app.txt
+git commit -m "Added buggy code"
+
+git log --oneline
+
+git reset --hard HEAD~1
+
+cat app.txt
+
+Expected Output:
+
+Version 1
+Viva Questions
+Q1. What is rollback in Git?
+
+Rollback is the process of returning a project to a previous stable version.
+
+Q2. Which command is used to roll back the last commit?
+git reset --hard HEAD~1
+Q3. Which command is safer after pushing to GitHub?
+git revert HEAD
+Q4. How can you view commit history?
+git log --oneline
+Q5. What does HEAD~1 mean?
+
+It refers to one commit before the current HEAD commit.
+
+Exam Shortcut
+
+If the examiner asks:
+
+"Rollback the last commit."
+
+Execute:
+
+git log --oneline
+git reset --hard HEAD~1
+
+If the commit was already pushed to GitHub:
+
+git revert HEAD
+
+Remember:
+
+git reset = Deletes commit history (local rollback)
+git revert = Creates a new commit to undo changes (safe for GitHub/shared repositories)
