@@ -1,0 +1,453 @@
+# AWS S3 Static Website Hosting - Complete Lab Notes
+
+## Objective
+
+Host a static website using Amazon S3.
+
+You will learn:
+
+* Create an S3 Bucket
+* Upload Website Files
+* Enable Static Website Hosting
+* Configure Bucket Permissions
+* Access Website Through Public URL
+
+---
+
+# Architecture
+
+```text
+User Browser
+      |
+      v
+Internet
+      |
+      v
+S3 Static Website Bucket
+      |
+      +--> index.html
+      +--> style.css
+      +--> images/
+```
+
+---
+
+# Prerequisites
+
+* AWS Account
+* Basic HTML Website
+
+Example:
+
+```text
+index.html
+style.css
+images/
+```
+
+---
+
+# Step 1: Create S3 Bucket
+
+Navigation:
+
+```text
+AWS Console
+→ S3
+→ Create Bucket
+```
+
+Configuration:
+
+| Parameter           | Value                 |
+| ------------------- | --------------------- |
+| Bucket Name         | my-static-website-777 |
+| AWS Region          | Any Region            |
+| Block Public Access | Uncheck All           |
+
+⚠ AWS Warning Appears
+
+Check:
+
+```text
+I acknowledge that the current settings might result in this bucket and the objects within becoming public.
+```
+
+Click:
+
+```text
+Create Bucket
+```
+
+---
+
+# Step 2: Upload Website Files
+
+Open Bucket
+
+```text
+my-static-website-777
+```
+
+Click:
+
+```text
+Upload
+```
+
+Upload:
+
+```text
+index.html
+style.css
+images/
+```
+
+Click:
+
+```text
+Upload
+```
+
+---
+
+# Example index.html
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<title>My First S3 Website</title>
+</head>
+<body>
+<h1>Welcome to AWS S3 Hosting</h1>
+<p>Website hosted using Amazon S3.</p>
+</body>
+</html>
+```
+
+---
+
+# Step 3: Enable Static Website Hosting
+
+Navigation:
+
+```text
+Bucket
+→ Properties
+```
+
+Scroll Down
+
+Locate:
+
+```text
+Static Website Hosting
+```
+
+Click:
+
+```text
+Edit
+```
+
+Select:
+
+```text
+Enable
+```
+
+Configuration:
+
+| Field          | Value                 |
+| -------------- | --------------------- |
+| Hosting Type   | Host Static Website   |
+| Index Document | index.html            |
+| Error Document | error.html (optional) |
+
+Save Changes.
+
+---
+
+# Step 4: Copy Website Endpoint
+
+After enabling hosting:
+
+```text
+Bucket
+→ Properties
+→ Static Website Hosting
+```
+
+You will see:
+
+```text
+Bucket Website Endpoint
+```
+
+Example:
+
+http://my-static-website-777.s3-website-us-east-1.amazonaws.com
+
+Save this URL.
+
+---
+
+# Step 5: Configure Bucket Policy
+
+Without permissions:
+
+```text
+403 Forbidden
+```
+
+will appear.
+
+---
+
+## Navigate
+
+```text
+Bucket
+→ Permissions
+→ Bucket Policy
+→ Edit
+```
+
+Paste:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicReadAccess",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::my-static-website-777/*"
+    }
+  ]
+}
+```
+
+Replace:
+
+```text
+my-static-website-777
+```
+
+with your bucket name.
+
+Save.
+
+---
+
+# Step 6: Verify Website
+
+Open:
+
+```text
+Bucket Website Endpoint
+```
+
+Expected Output:
+
+```text
+Welcome to AWS S3 Hosting
+Website hosted using Amazon S3.
+```
+
+Website is now publicly accessible.
+
+---
+
+# Hosting Using AWS CLI
+
+## Create Bucket
+
+```bash
+aws s3 mb s3://my-static-website-777
+```
+
+---
+
+## Upload Files
+
+```bash
+aws s3 cp index.html s3://my-static-website-777
+```
+
+Upload entire website:
+
+```bash
+aws s3 cp website/ s3://my-static-website-777 --recursive
+```
+
+---
+
+## Enable Website Hosting
+
+```bash
+aws s3 website s3://my-static-website-777 \
+--index-document index.html
+```
+
+---
+
+## Apply Bucket Policy
+
+```bash
+aws s3api put-bucket-policy \
+--bucket my-static-website-777 \
+--policy file://policy.json
+```
+
+---
+
+# Common Errors
+
+## Error 1
+
+```text
+403 Forbidden
+```
+
+Reason:
+
+```text
+Bucket Policy Missing
+```
+
+Fix:
+
+```text
+Add Public Read Policy
+```
+
+---
+
+## Error 2
+
+```text
+Access Denied
+```
+
+Reason:
+
+```text
+Block Public Access Enabled
+```
+
+Fix:
+
+```text
+Disable Block Public Access
+```
+
+---
+
+## Error 3
+
+```text
+404 Not Found
+```
+
+Reason:
+
+```text
+index.html Missing
+```
+
+Fix:
+
+```text
+Upload index.html
+```
+
+---
+
+# Viva Questions
+
+## What is Amazon S3?
+
+Amazon S3 (Simple Storage Service) is AWS object storage used to store files, images, videos, backups and static websites.
+
+---
+
+## What is Static Website Hosting?
+
+Static Website Hosting allows an S3 bucket to serve HTML, CSS and JavaScript files as a website.
+
+---
+
+## Can S3 Host PHP or Node.js Applications?
+
+No.
+
+S3 can host only:
+
+* HTML
+* CSS
+* JavaScript
+* Images
+* Static Assets
+
+Dynamic applications require:
+
+* EC2
+* Elastic Beanstalk
+* ECS
+* Lambda
+
+---
+
+## Why Do We Disable Block Public Access?
+
+To allow users on the internet to access website files stored in the bucket.
+
+---
+
+## What Permission Is Required?
+
+```json
+"s3:GetObject"
+```
+
+This permission allows visitors to read website files.
+
+---
+
+## What Is Bucket Policy?
+
+A Bucket Policy is a JSON document that defines who can access bucket resources and what actions they can perform.
+
+---
+
+## Difference Between S3 Website Endpoint and Object URL
+
+| Website Endpoint     | Object URL            |
+| -------------------- | --------------------- |
+| Hosts Website        | Direct File Access    |
+| Supports index.html  | No Default Page       |
+| Supports Error Pages | No Error Page Routing |
+
+---
+
+# Lab Result
+
+Successfully Hosted Static Website on Amazon S3
+
+Components Used:
+
+* Amazon S3 Bucket
+* Static Website Hosting
+* Bucket Policy
+* Public Read Access
+* HTML/CSS Files
+
+Result:
+
+```text
+User → Internet → S3 Bucket Website
+```
